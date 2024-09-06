@@ -38,15 +38,15 @@ def main_loop():
         while running:
             start_time = time.time()
             data  = input_data.wait_for_data()
+            end_time = time.time()
+            
             transformed_data = space_transformer.apply_transform(data)
             merged_data = space_merger.merge(transformed_data)
-
             map_data, tracked_data = track2(merged_data)
            
             output.update(tracked_data)
             output.write_to_kafka()
-            end_time = time.time()
-
+            
             print(f"Waiting Time is: {round((end_time - start_time)*1e3)} ms")
 
         input_data.stop()

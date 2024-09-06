@@ -63,7 +63,7 @@ class KafkaConsumer:
 
 
 class InputData:
-    def __init__(self, broker="172.21.243.238:9092", topic = "kit-detector", group_id = "tracking_core_consumer_1") -> None:
+    def __init__(self, broker="172.21.243.238:9092", topic = "kit-detector-topic", group_id = "tracking_core_consumer_1") -> None:
         self.__id = 0
         self.__kafka_consumer = KafkaConsumer(broker, group_id, topic)
         self.__kafka_consumer.start()
