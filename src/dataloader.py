@@ -19,10 +19,12 @@ class DataLoader:
             with open(file, 'r') as fp:
                 data = json.load(fp)
                 name = file.name.split('.')[0]
+                # print(name)
                 result[name] = data
         result['cams_config'] = []
         for key in result:
-            if 'cam' in key:
+            if 'cam' in key and 'calib_' in key:
+                # print(key)
                 result['cams_config'].append(result[key])
         return result
 

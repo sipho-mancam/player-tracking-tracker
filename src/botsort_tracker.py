@@ -265,4 +265,21 @@ def track2(detections:list):
     o_detections.extend(dets)
     return o_detections, tracking_results
 
-    
+
+
+def track_raw(detections:list):
+    # print(f"Kit Detector Time: {kit_detector.get_execution_time()} ms \t For Detections {len(detections)}")
+    res = []
+    tracking_results = {}
+    for _, det in enumerate(detections):
+        res.append({
+            'coordinates':det['coordinates'],
+            'tracking-id': 0, #det.get('guid') if det.get('guid') else -1,
+            'bbox': det['box'],
+            'conf': det['confidence'], 
+            'kit_color':det.get('kit_color'),
+            'alert':det.get('alert')
+        })
+            
+    tracking_results['tracks'] = res
+    return detections, tracking_results

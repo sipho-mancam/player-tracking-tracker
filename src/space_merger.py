@@ -23,7 +23,7 @@ class SpaceMerger:
 
         self.init()
 
- 
+
     def init(self)->None:
         self.__m_left_overlap = (self.__mini_boundary[0]['coordinates'][0] - self.__main_boundary[0]['coordinates'][0])*self.__left_wing
         self.__m_right_overlap = (self.__main_boundary[1]['coordinates'][0]- self.__mini_boundary[1]['coordinates'][0])*self.__left_wing
@@ -55,7 +55,7 @@ class SpaceMerger:
             x_shifted = x_scaled + (self.__left_wing + self.__middle)
             return x_shifted
         return x_coord
-    
+
     def overlap_has_child(self, det, cam_dets:list[dict])->dict:
         '''
         1. Look for the child associated with the overlap center detection, if any.
@@ -92,9 +92,9 @@ class SpaceMerger:
             det['child'] = child
             det['has_child'] = True
             det['marker_id'] =  id(det)
-            del child              
+            del child
         return det
-    
+
     def is_in_overlap(self, det):
         coord = det.get('coordinates')
         det['is_overlap'] = False
@@ -107,7 +107,7 @@ class SpaceMerger:
             det['overlap_side'] = 0 # cam 0
             # print(det, overlap_start, overlap_end)
             return det
-        
+
         # check overlap in the right region
         error_constant_2 = 0.01
         overlap_start = (self.__left_wing + self.__middle) - error_constant_2
@@ -117,9 +117,9 @@ class SpaceMerger:
             det['overlap_side'] = 2 # cam 3
             # print(det, overlap_start, overlap_end)
             return det
-        
+
         return det
-        
+
     # stream1 = 0-30%; stream2 = 31-70%; stream3 = 71-100%
     def merge(self, cams_detections:list[list[dict]])->list[dict]:
         unified_space = []
@@ -133,6 +133,7 @@ class SpaceMerger:
                 coord = det['coordinates']
                # left wing
                 if idx == 0:
+                    
                     if (coord[0] >= 0 and coord[0]<=1) and (coord[1]>=0 and coord[1] <=1):
                         x_scaled = self.align_x(coord[0], idx)#coord[0] * self.__left_wing
                         det['coordinates'] = (x_scaled, coord[1])
@@ -168,7 +169,7 @@ class SpaceMerger:
                     c_2_det = self.overlap_has_child(c_2_det, cam1_space)
                 elif cam_side == 2:
                     c_2_det = self.overlap_has_child(c_2_det, cam3_space)
-                
+
         unified_space.extend(cam1_space)
         unified_space.extend(cam2_space)
         unified_space.extend(cam3_space)
