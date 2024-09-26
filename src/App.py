@@ -42,7 +42,7 @@ def main_loop():
             
             transformed_data = space_transformer.apply_transform(data)
             merged_data = space_merger.merge(transformed_data)
-            map_data, tracked_data = track2(merged_data)
+            map_data, tracked_data = track_raw(merged_data)
            
             output.update(tracked_data)
             output.write_to_kafka()

@@ -5,6 +5,7 @@ import time
 import math
 
 class Point:
+    MINIMUM_PROXIMITY_DISTANCE = 0.035
     def __init__(self, x:float, y:float, typ:str, radius:int,  color:tuple=(255, 0, 0), id=0)->None:
         self.__x = x
         self.__y = y
@@ -76,11 +77,12 @@ class Point:
     
 
 class ProximityCalculator:
-    def __init__(self, x_list:list, o_list:list)->None:
+    def __init__(self, x_list:list, o_list:list, min_dist = False)->None:
         self.__x_list = x_list
         self.__o_list = o_list
         self.__selected_vertices = []
         self.__selected_indices = []
+        self.__filter = min_dist
 
         self.__graph = [
             # {'id':'X', 'edges':{'1':0.3,  '3':0.5,  '2':0.55, '4':0.7}},
@@ -97,11 +99,16 @@ class ProximityCalculator:
             for point in self.__x_list:
                 if point.id == id:
                     point.extras = ('vertex', node.get('vertex'))
+                    point.extras = ('distance', node.get('edges', {}).get(node.get('vertex')))
                     break
 
         for point in self.__x_list:
             extras = point.extras
             id = extras.get('vertex')
+
+            if self.__filter and extras.get('distance') is not None and extras.get('distance') > Point.MINIMUM_PROXIMITY_DISTANCE:
+                continue
+            
             if id is not None:
                 for o_point in self.__o_list:
                     if o_point.id == id:
@@ -255,11 +262,11 @@ class JumpsInvestigator:
         self.__stage = [] # The Stage contains the element that are in the process of being cleared to commit.
         self.__clear_to_commit = []
         self.__obstruction_dist = 0.03
-        self.__find_flagged()
+        # self.__find_flagged()
 
         # All investigates will be done here in order.
-        self.__investigate_obstructions()
-
+        # self.__investigate_obstructions()
+        self.__stage = tracks
         # update elements that need updating.
         self.__update_stage()
 

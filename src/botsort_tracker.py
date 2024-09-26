@@ -6,6 +6,7 @@ from cfg.config_ import TrackingConf
 import time
 from tracker.kalman_associator import AssociationsManager
 from pprint import pprint
+from state_representation import State
 
 tracker = BoTSORT(TrackingConf(), 10)
 frame_count = 0
@@ -220,6 +221,7 @@ b_c2 =  (104.19   ,   108.46    ,  105.73)#(249.18 , 251.15 , 246.8)
  
 tracks_manager = TrackObjectsManager()
 associations_manager = AssociationsManager((b_c1, b_c2))
+missed_detections_stateman = State()
 
 def filter_list(full_list:list, comp_list:list)->list:
     for det in comp_list:
@@ -234,6 +236,8 @@ def filter_list(full_list:list, comp_list:list)->list:
     return comp_list
 
 def track2(detections:list):
+    # Perform missed detections filling and state estimation
+    detections = missed_detections_stateman.update_state_data(detections)
     # print(f"Kit Detector Time: {kit_detector.get_execution_time()} ms \t For Detections {len(detections)}")
     det_output = convert_to_output_results(detections)
     global tracker
@@ -269,6 +273,7 @@ def track2(detections:list):
 
 def track_raw(detections:list):
     # print(f"Kit Detector Time: {kit_detector.get_execution_time()} ms \t For Detections {len(detections)}")
+    detections = missed_detections_stateman.update_state_data(detections)
     res = []
     tracking_results = {}
     for _, det in enumerate(detections):

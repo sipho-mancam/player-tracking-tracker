@@ -3,8 +3,9 @@ import json
 import time
 from pathlib import Path
 from cfg.paths_config import __BASE_DIR__, __TRACKING_DATA_DIR__, __KAFKA_CONFIG__
-
 from pprint import pprint
+
+
 
 class DetectionsOutput:
     def __init__(self)->None:

@@ -117,6 +117,7 @@ class PerspectiveTransform(BTransformations):
         for point in self.__src_poly:
             if point[0] == x_0 and (point[1] - min(y_vector)) < 200:
                 right_wing = True
+            
 
         self.__top_offset = 400
         self.__left_offset = 0
@@ -209,11 +210,8 @@ class PerspectiveTransform(BTransformations):
 
 class Transformer:
     def __init__(self, width, height, pitch_coordinates:dict, id=0)->None:
-        self.__detections_list = None
         self.__mini_boudary = []
         self.__mini_boundary_transformed = [] 
-        self.__init_done = False
-        self.__transformations = []
         self.__stream_id = id
         self.__centre_point = None
         self.__pers_transformer = None
