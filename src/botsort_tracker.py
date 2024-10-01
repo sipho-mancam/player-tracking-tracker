@@ -236,34 +236,43 @@ def filter_list(full_list:list, comp_list:list)->list:
     return comp_list
 
 def track2(detections:list):
-    # Perform missed detections filling and state estimation
-    detections = missed_detections_stateman.update_state_data(detections)
-    # print(f"Kit Detector Time: {kit_detector.get_execution_time()} ms \t For Detections {len(detections)}")
-    det_output = convert_to_output_results(detections)
     global tracker
     global tracks_manager
 
-    s_time = time.time()
+    # detections = missed_detections_stateman.update_state_data(detections)
+    det_output = convert_to_output_results(detections)
     online_tracks = tracker.update(det_output)
-    e_time = time.time()
-    tracking_results = {}
-    res = []
     o_detections = detections
     detections = associate_dets_with_ids(detections, online_tracks)
     # detections = tracks_manager.update(detections)
-    # print("Detections received for tracking", len(detections))
     associations_manager.update(o_detections)
     dets = associations_manager.get_dets()
- 
+
+    tracking_results = {}
+    res = []
+
+    for _, det in enumerate(detections):
+        res.append({
+            'coordinates':det['coordinates'],
+            'tracking-id': None,#det.get('track_id') if det.get('track_id') else -1,
+            'bbox': det['box'],
+            'conf': det['confidence'], 
+            'kit_color':(255, 0, 255),#det.get('kit_color'),
+            'alert':det.get('alert')
+        })
+
+
     for _, det in enumerate(dets):
         res.append({
             'coordinates':det['coordinates'],
             'tracking-id': det.get('guid') if det.get('guid') else -1,
             'bbox': det['box'],
             'conf': det['confidence'], 
-            'kit_color':det.get('kit_color'),
+            'kit_color':det.get('kit_color'),# if not det.get('dead') else (255, 255, 255),
             'alert':det.get('alert')
         })
+
+   
             
     tracking_results['tracks'] = res
     o_detections.extend(dets)

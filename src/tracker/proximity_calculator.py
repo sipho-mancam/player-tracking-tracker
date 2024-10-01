@@ -5,7 +5,7 @@ import time
 import math
 
 class Point:
-    MINIMUM_PROXIMITY_DISTANCE = 0.035
+    MINIMUM_PROXIMITY_DISTANCE = 0.05
     def __init__(self, x:float, y:float, typ:str, radius:int,  color:tuple=(255, 0, 0), id=0)->None:
         self.__x = x
         self.__y = y
@@ -262,11 +262,11 @@ class JumpsInvestigator:
         self.__stage = [] # The Stage contains the element that are in the process of being cleared to commit.
         self.__clear_to_commit = []
         self.__obstruction_dist = 0.03
-        # self.__find_flagged()
+        self.__find_flagged()
 
         # All investigates will be done here in order.
-        # self.__investigate_obstructions()
-        self.__stage = tracks
+        self.__investigate_obstructions()
+        # self.__stage = tracks
         # update elements that need updating.
         self.__update_stage()
 

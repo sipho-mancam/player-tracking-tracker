@@ -235,7 +235,6 @@ class TrackLet:
                 
                 if self.__alert_state:
                     self.__det_raw['alert'] = self.__alert_state
-                
                 return True
 
 
@@ -335,21 +334,8 @@ class TrackLet:
     def assign_det(self, det)->None:
         if det is None:
             return 
-    
-        self.__temporary_state = det
-        # investigate if we should proceed with this action, or raise a flag
-        coord = self.__temporary_state.get("coordinates")
-        jump_dist = self.__euclidean_dist(coord, self.__coordinates)
-        self.__jump_distance = jump_dist
-        # print(f"Jump Distance: {jump_dist}  GUID: {self.global_id} Track_ID {self.__temporary_state.get('track_id') if self.temp_state else ''}", )
-        if jump_dist >= self.__sig_jump_dist and not self.__obstructed:
-            self.__flagged = True
-            return
-        elif self.__obstructed and jump_dist >= self.__ob_dist: # if this object was obstructed, the acceptable jump distance is 0.04
-            self.__flagged = True
-            return
-      
         
+        self.__temporary_state = det
         self.__det_raw = det
         self.__coordinates = self.__det_raw['coordinates']
         self.__tracked_id = self.__det_raw.get('track_id')
@@ -360,8 +346,6 @@ class TrackLet:
 
         if self.__jump_distance > self.__alert_distance:
             self.__det_raw['alert'] = True
-      
-
         return
     
     def to_point(self)->Point:
@@ -439,6 +423,9 @@ class TrackLet:
         self.__det_raw['coordinates'] = self.__kalman_filter.get_state()[:2].tolist()
         self.__det_raw['dead'] = not self.found()
         self.__det_raw['death_percentage'] = self.death_percentage
+
+        if not self.found():
+            self.__life_span -= 1
         return self.__det_raw
 
     def update(self)->None:
@@ -479,7 +466,8 @@ class AssociationsManager:
         self.__unfound_tracklets = []
         self.__guid_counter = 1
         self.__tracklets_pool = [] # Full list of tracklets
-        self.__tracklets_limit = 24
+        self.__reset_tracks = [] # This contains a list of the tracks that need to be reset.
+        self.__tracklets_limit = 26
         self.__team_ids_track = [{'ids_track':0, 'tracklets':[], 'color':teams_colors[0], 'init':False, 'id':2, 'guid':0}, 
                                  {'ids_track':0, 'tracklets':[], 'color':teams_colors[1], 'init':False, 'id':1, 'guid':0}]
         self.__teams_init = False
@@ -612,6 +600,41 @@ class AssociationsManager:
             res += track.__str__() + "\n"
         return res
     
+    def proximity_association(self, dets, tracks_list, min_dist=True)->None:
+          # Convert the remaining detections to points using
+        o_list = []
+        x_list = []
+        for idx, det in enumerate(dets):
+            det['id'] = idx 
+            point = TrackLet.detection_to_point(det)
+            o_list.append(point)
+    
+        for track in tracks_list:
+            x_list.append(track.to_point())
+
+        pc = ProximityCalculator(x_list, o_list, min_dist)
+        pc.compute()
+        x_list, _ = pc.get_associated_points()
+        for x in x_list:
+            for t in tracks_list:
+                if x.id == t.guid:
+                    if x.extras.get('found_det') is not None:
+                        t.assign_det(x.extras['found_det'])
+                        i = dets.index(x.extras['found_det'])
+                        dets.pop(i)
+                        # print(f"Detection Index: {i}")
+                        t.set_found()
+                    break
+
+        # Check all the tracks that have been flagged and let's investigate.
+        if not min_dist:
+            ji = JumpsInvestigator(tracks_list)
+            commits = ji.get_tracks()
+            for track in commits:
+                track.commit()
+
+
+    
     def update(self, dets:list)->None:
         """
         1. Associate with IDS
@@ -626,35 +649,19 @@ class AssociationsManager:
                 self.__unfound_tracklets.append(tracklet)
                 tracklet.clear_found()
 
-        # Convert the remaining detections to points using
-        o_list = []
-        x_list = []
 
-        for idx, det in enumerate(dets):
-            det['id'] = idx 
-            point = TrackLet.detection_to_point(det)
-            o_list.append(point)
-    
-        for track in self.__unfound_tracklets:
-            x_list.append(track.to_point())
-   
-        if self.__teams_init:
-            pc = ProximityCalculator(x_list, o_list)
-            pc.compute()
-            x_list, _ = pc.get_associated_points()
-            for x in x_list:
-                for t in self.__unfound_tracklets:
-                    if x.id == t.guid:
-                        if x.extras.get('found_det') is not None:
-                            t.assign_det(x.extras['found_det'])
-                        break
+        if self.__teams_init:      
+            self.proximity_association(dets, self.__unfound_tracklets)
+            # Associate the available detections with the tracklets that are ready to be reset
+            self.proximity_association(dets, self.__reset_tracks, False)
+            
+            # Remove the tracks that are reset.
+            for i, track in enumerate(self.__reset_tracks):
+                if track.found():
+                    i = self.__reset_tracks.index(track)
+                    self.__reset_tracks.pop(i)  
 
-            # Check all the tracks that have been flagged and let's investigate.
-            ji = JumpsInvestigator(self.__tracklets_pool)
-            commits = ji.get_tracks()
-            for track in commits:
-                track.commit()
-      
+
         if self.__tracklets_limit % 2 != 0:
             self.__tracklets_limit += 1
 
@@ -693,17 +700,24 @@ class AssociationsManager:
                     self.__guid_counter += 1
 
         # update the Kalman filters in the tracklets found and asscoiated
-        for tracklet in self.__associated_tracklets:
-            tracklet.update()
-
-        for tracklet in self.__unfound_tracklets:
+        for tracklet in self.__tracklets_pool:
             tracklet.update()
 
         self.__associated_tracklets = []
         self.__unfound_tracklets = []
 
     def get_dets(self)->list:
-        return [track.get_dict() for track in self.__tracklets_pool]
+        result = []
+        for tracklet in self.__tracklets_pool:
+            if tracklet.life_span > 0:
+                result.append(tracklet)
+            else:
+                try:
+                    self.__reset_tracks.index(tracklet)
+                except ValueError as ve:
+                    self.__reset_tracks.append(tracklet)
+
+        return [track.get_dict() for track in result]
     
     def whos_closer_than_x(self, x:float, det:dict, tracklets:list[TrackLet])->tuple[list[float], list[TrackLet]]:
         closer_tracker = []

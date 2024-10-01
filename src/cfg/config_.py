@@ -7,7 +7,7 @@ re_id_model_path = Path(r"./App/src/fast_reid/pretrained/mot17_sbs_S50.pth").res
 class TrackingConf(object):
     def __init__(self) -> None:
         self.track_high_thresh = 0.8
-        self.track_low_thresh = 0.25
+        self.track_low_thresh = 0.55
         self.new_track_thresh = 0.5
         self.track_buffer = 30
         self.match_thresh = 0.9

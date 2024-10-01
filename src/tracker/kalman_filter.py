@@ -49,8 +49,8 @@ class KalmanFilter(object):
         # Motion and observation uncertainty are chosen relative to the current
         # state estimate. These weights control the amount of uncertainty in
         # the model. This is a bit hacky.
-        self._std_weight_position = 1. / 80 # At 20 we were tracking okay
-        self._std_weight_velocity = 0.9#1. / 560 # at 360 players were tracked okay aT 260, the goal keepers were tracked constantly
+        self._std_weight_position = 1. / 20 # At 20 we were tracking okay
+        self._std_weight_velocity = 1. / 260 # at 360 players were tracked okay aT 260, the goal keepers were tracked constantly
 
     def initiate(self, measurement):
         """Create track from unassociated measurement.
