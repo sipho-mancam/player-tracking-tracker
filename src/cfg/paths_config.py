@@ -12,5 +12,6 @@ __VIDEO_REC_OUTPUT_DIR__ = Path(r"E:\Tracking Footage")
 __WHITE_BG__ = (__BASE_DIR__ / Path(r"../assets/white_bg.jpg")).resolve()
 __ASSETS_DIR__ =  (__BASE_DIR__ / Path(r"../assets")).resolve()
 __MAP_BG_PATH__ = (__ASSETS_DIR__ / Path("soccer_pitch_poles.png")).resolve()
+__CRICKET_CALIB_ROOT__ = (Path(r"C:\ProgramData\Player Tracking Software\shared_files\calibration_data\cricket"))
 
 # print(os.path.exists(__MAP_BG_PATH__), __MAP_BG_PATH__.as_posix())       

@@ -3,7 +3,7 @@ from pathlib import Path
 import json
 import math
 import numpy as np
-
+from cfg.paths_config import __CRICKET_CALIB_ROOT__
 class Point:
     MINIMUM_PROXIMITY_DISTANCE = 0.025
     def __init__(self, x, y, id, data={}, col=(255, 0, 0),  **kwargs) -> None:
@@ -123,8 +123,7 @@ class StateLoader:
 
 class DataLoader:
     def __init__(self) -> None:
-        self.__root = Path(os.getcwd() + "/calib_data")    
-        print(os.path.exists(self.__root), self.__root.as_posix())
+        self.__root = __CRICKET_CALIB_ROOT__    
 
     def load_config_data(self)->dict:
         """
@@ -142,6 +141,7 @@ class DataLoader:
             if 'cam' in key and 'calib_' in key:
                 # print(key)
                 result['cams_config'].append(result[key])
+        print(result)
         return result
 
         
