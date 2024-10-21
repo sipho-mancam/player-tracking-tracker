@@ -141,7 +141,6 @@ class DataLoader:
             if 'cam' in key and 'calib_' in key:
                 # print(key)
                 result['cams_config'].append(result[key])
-        print(result)
         return result
 
         

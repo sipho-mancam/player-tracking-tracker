@@ -28,5 +28,4 @@ class SpaceTransformer:
         for idx, cam_detections in enumerate(cams_detections_lists):
             res = self.__transformers[idx].transform(cam_detections)    
             results.append(res)
-        
         return results

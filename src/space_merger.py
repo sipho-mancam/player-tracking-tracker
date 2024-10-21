@@ -5,9 +5,9 @@ import math
 class SpaceMerger:
     def __init__(self, main_boundary:list, inner_boundary:list)->None:
         self.__stream_results = [] # a list of tuples containing the current results
-        self.__left_wing = 7/20
-        self.__right_wing = 7/20
-        self.__middle = 6/20
+        self.__left_wing = 0.3
+        self.__right_wing = 0.3
+        self.__middle = 0.4
         self.__m_overlap = (1/20)*0.3
         self.__is_init = False
 
@@ -25,6 +25,7 @@ class SpaceMerger:
 
 
     def init(self)->None:
+        return
         self.__m_left_overlap = (self.__mini_boundary[0]['coordinates'][0] - self.__main_boundary[0]['coordinates'][0])*self.__left_wing
         self.__m_right_overlap = (self.__main_boundary[1]['coordinates'][0]- self.__mini_boundary[1]['coordinates'][0])*self.__left_wing
 
@@ -98,6 +99,7 @@ class SpaceMerger:
     def is_in_overlap(self, det):
         coord = det.get('coordinates')
         det['is_overlap'] = False
+
         # This is the left overlap region
         error_constant = 0.01
         overlap_start = self.__left_wing - self.__m_left_overlap - error_constant
@@ -117,7 +119,6 @@ class SpaceMerger:
             det['overlap_side'] = 2 # cam 3
             # print(det, overlap_start, overlap_end)
             return det
-
         return det
 
     # stream1 = 0-30%; stream2 = 31-70%; stream3 = 71-100%
@@ -135,9 +136,12 @@ class SpaceMerger:
                 if idx == 0:
                     
                     if (coord[0] >= 0 and coord[0]<=1) and (coord[1]>=0 and coord[1] <=1):
-                        x_scaled = self.align_x(coord[0], idx)#coord[0] * self.__left_wing
+                        # This will scale and shift to align the points on the abstract space.
+                        x_scaled = self.align_x(coord[0], idx)
+                        # The Y Coordinate is not touched.
                         det['coordinates'] = (x_scaled, coord[1])
-                        det = self.is_in_overlap(det)
+                        # Test if the point lives in the overlap space.
+                        # det = self.is_in_overlap(det)
                         det['camera'] = idx
                         cam1_space.append(det)
                 # middle
@@ -145,7 +149,7 @@ class SpaceMerger:
                     if (coord[0]>=0 and coord[0]<=1-offset) and (coord[1]>=0 and coord[1]<=1):
                         x_shifted = self.align_x(coord[0], idx)
                         det['coordinates'] = (x_shifted, coord[1])
-                        det = self.is_in_overlap(det)
+                        # det = self.is_in_overlap(det)
                         det['box']['x1'] += width
                         det['box']['x2'] += width
                         det['camera'] = idx
@@ -156,7 +160,7 @@ class SpaceMerger:
                     if (coord[0] >= 0 and coord[0]<=1) and (coord[1]>=0 and coord[1] <=1):
                         x_shifted = self.align_x(coord[0], idx)
                         det['coordinates'] =  (x_shifted, coord[1])
-                        det = self.is_in_overlap(det)
+                        # det = self.is_in_overlap(det)
                         det['box']['x1'] += 2*width
                         det['box']['x2'] += 2*width
                         det['camera'] = idx

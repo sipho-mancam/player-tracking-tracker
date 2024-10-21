@@ -19,6 +19,8 @@ def main_loop():
         global running
         #input data from external source
         input_data = InputData()
+
+        # If calibration data doesn't exist, send a message to the UI and wait till it exist.
         config_data = DataLoader().load_config_data()
 
         # Transformer
@@ -27,9 +29,11 @@ def main_loop():
         space_transformer = SpaceTransformer(f_width, f_height, config_data['cams_config'])
 
         # Space Merger
-        transformer = space_transformer.get_transformer(1)
-        mini_boundary = transformer.get_mini_boudary()
-        main_boundary = transformer.getDstPts()
+        # transformer = space_transformer.get_transformer(1)
+        # mini_boundary = transformer.get_mini_boudary()
+        # main_boundary = transformer.getDstPts()
+        mini_boundary = []
+        main_boundary = []
         space_merger = SpaceMerger(main_boundary, mini_boundary)
 
         # Output
@@ -42,14 +46,14 @@ def main_loop():
               
             transformed_data = space_transformer.apply_transform(data)
             merged_data = space_merger.merge(transformed_data)
+            # Apply the tracking algorithm here ....
             map_data, tracked_data = track2(merged_data)
-           
+
+            # Send data tagged with Tracking IDs here ....
             output.update(tracked_data)
             output.write_to_kafka()        
             end_time = time.time()
             
-            # print(f"Waiting Time is: {round((end_time - start_time)*1e3)} ms")
-
         input_data.stop()
         return 0
     except KeyboardInterrupt as ke:
