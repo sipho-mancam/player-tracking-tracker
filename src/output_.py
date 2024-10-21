@@ -23,8 +23,7 @@ class DetectionsOutput:
     def write_to_kafka(self):
         if self.__output is not None:
             # pprint(self.__output)
-            self.__kafka_producer.send_message('ui-data', json.dumps(self.__output))
-            # print("Written data to kafka")
+            self.__kafka_producer.send_message('tracking-core', json.dumps(self.__output))
 
     def write_to_file(self):
         if self.__output is not None:
