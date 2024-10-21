@@ -13,9 +13,12 @@ class DetectionsOutput:
         self.__output = None
         self.__kafka_producer = KProducer(__KAFKA_CONFIG__)
         self.__output_dir = __TRACKING_DATA_DIR__
+        self.__frame_count = 0
 
     def update(self, data:dict)->None:
         self.__output = data
+        self.__output['frame_number'] = self.__frame_count
+        self.__frame_count += 1
 
     def write_to_kafka(self):
         if self.__output is not None:

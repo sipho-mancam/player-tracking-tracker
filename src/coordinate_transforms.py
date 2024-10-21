@@ -38,9 +38,9 @@ class BTransformations:
 
 
 class PerspectiveTransform(BTransformations):
-    def __init__(self, src_poly:list, centre_pt:tuple[int, int], **kwargs)->None:
+    def __init__(self, src_poly:list, centre_pt:tuple[int, int], id = 0, **kwargs)->None:
         super().__init__()
-        self.__src_poly = src_poly
+        # self.__src_poly = src_poly
         self.__dst_poly = []
         self.__pers_matrix = None
         self.__centre_pt = centre_pt
@@ -50,7 +50,8 @@ class PerspectiveTransform(BTransformations):
         self.__dst_height = 0
         self.__width = int(2590*0.98)
         self.__height = int(1942*0.7)
-        self.__sort_points()
+        self.__id = id
+        self.__sort_points(src_poly)
         self.__calculate_dst_poly()
         self.__init()
         
@@ -112,11 +113,14 @@ class PerspectiveTransform(BTransformations):
         x_vector = [x[0] for x in self.__src_poly]
         alpha = 250
         x_0 = min(x_vector)    
-
+        
+        sorted_y = sorted(y_vector)
          # determine if its the left wing or the right wing
-        for point in self.__src_poly:
-            if point[0] == x_0 and (point[1] - min(y_vector)) < 200:
-                right_wing = True
+        # for point in self.__src_poly:
+        # point = self.__src_poly[0]
+            # if point[0] == x_0 and (point[1] == sorted_y[1]):
+        if self.__id == 2:
+            right_wing = True
             
 
         self.__top_offset = 400
@@ -144,12 +148,16 @@ class PerspectiveTransform(BTransformations):
             self.__dst_poly.append((x3, y3))
             self.__dst_poly.append((x1, y1))
             self.__dst_poly.append((x2, y2))
+
         self.__dst_width = self.__width
         self.__dst_height = self.__height
         
 
-    def __sort_points(self)->None:
-        self.__src_poly = sorted(self.__src_poly)
+    def __sort_points(self, pts = None)->None:
+        if pts is None:
+            self.__src_poly = sorted(self.__src_poly)
+            return
+        self.__src_poly = sorted(pts)
 
     def transform(self, detections:list[dict])->list[dict]:
         super().transform(detections)
@@ -225,7 +233,7 @@ class Transformer:
 
 
     def init(self):
-        self.__pers_transformer = PerspectiveTransform(self.__src_pts, self.__centre_point)
+        self.__pers_transformer = PerspectiveTransform(self.__src_pts, self.__centre_point, id = self.__stream_id)
         self.__is_init = True
         return
         

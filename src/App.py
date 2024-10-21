@@ -37,19 +37,18 @@ def main_loop():
 
         while running:
             start_time = time.time()
+            # This is raw detections json converted data coming from either the detector or the kit-detector, depending on the sport.
             data  = input_data.wait_for_data()
-            
-            
+              
             transformed_data = space_transformer.apply_transform(data)
             merged_data = space_merger.merge(transformed_data)
             map_data, tracked_data = track2(merged_data)
            
             output.update(tracked_data)
-            output.write_to_kafka()
-
+            output.write_to_kafka()        
             end_time = time.time()
             
-            print(f"Waiting Time is: {round((end_time - start_time)*1e3)} ms")
+            # print(f"Waiting Time is: {round((end_time - start_time)*1e3)} ms")
 
         input_data.stop()
         return 0
