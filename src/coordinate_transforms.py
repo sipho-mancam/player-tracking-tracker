@@ -71,39 +71,18 @@ class PerspectiveTransform(BTransformations):
     def transform(self, detections:list[dict])->list[dict]:
         super().transform(detections)
         src_pts = []
-        bbox_transforms = []
-        box_widths = []
-        box_heights = []
-        boxes = False
         for det in detections:
             if det.get('coordinates') is not None:
                 src_pts.append(det.get("coordinates"))
-                box = det.get('bbox')
-                if box is not None:
-                    bbox_transforms.append((box['x1'], box['y1']))
-                    b_width = box['x2'] - box['x1']
-                    b_height = box['y2'] - box['y1']
-                    box_widths.append(b_width)
-                    box_heights.append(b_height)
-                    boxes = True
-
-                if box is None:
-                    boxes = False
+        
         # apply the perspective transform here..
         result = []
         if len(src_pts) > 0:
-            trans = cv.perspectiveTransform(np.array(src_pts, dtype=np.float32)[None, :, :], self.__pers_matrix)
-            if boxes:
-                box_trans = cv.perspectiveTransform(np.array(bbox_transforms, dtype=np.float32)[None, :, :], self.__pers_matrix)
-                for det_ , t_b, w, h in zip(detections, box_trans[0], box_widths, box_heights):
-                    x1 = t_b[0]
-                    y1 = t_b[1]
-                    det_['t_box'] = {'x1': x1, "y1":y1, "x2":x1+w, "y2":y1+h}
-
+            trans = cv.perspectiveTransform(np.array([src_pts], dtype=np.float32), self.__pers_matrix)
             for transformed_point, det_  in zip(trans[0], detections):
-                det_["coordinates"] = (int(transformed_point[0]), int(transformed_point[1]))
+                det_["coordinates"] = (float(transformed_point[0]), float(transformed_point[1]))
                 if transformed_point[0] >= 0 and transformed_point[1] >=0:
-                    result.append((int(transformed_point[0]), int(transformed_point[1])))
+                    result.append((float(transformed_point[0]), float(transformed_point[1])))
         return detections, result
     
     def getDstPts(self)->list:

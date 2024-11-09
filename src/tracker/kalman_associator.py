@@ -653,6 +653,7 @@ class AssociationsManager:
         if self.__teams_init:      
             self.proximity_association(dets, self.__unfound_tracklets)
             # Associate the available detections with the tracklets that are ready to be reset
+            # Reset tracks must not care about minimum distance
             self.proximity_association(dets, self.__reset_tracks, False)
             
             # Remove the tracks that are reset.

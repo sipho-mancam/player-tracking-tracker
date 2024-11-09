@@ -51,8 +51,10 @@ def main_loop():
 
             # Send data tagged with Tracking IDs here ....
             output.update(tracked_data)
-            output.write_to_kafka()        
+            output.write_to_kafka()    
+            # output.write_to_file()    
             end_time = time.time()
+            print(f"Processing Time: {round(1e3*(end_time - start_time))} ms")
             
         input_data.stop()
         return 0

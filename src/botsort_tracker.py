@@ -16,7 +16,6 @@ def convert_to_output_results(arr):
     output_results = np.zeros((num_entries, 12))  # Assuming there are 10 elements in total
     for idx, entry in enumerate(arr):
         # Extract values from each dictionary entry
-        x1, y1, x2, y2 = entry['t_box']['x1'], entry['t_box']['y1'], entry['t_box']['x2'], entry['t_box']['y2']
         confidence = entry['confidence']
         cls = entry['class']
         x_1, y_1, x_2, y_2 = entry['box']['x1'], entry['box']['y1'], entry['box']['x2'], entry['box']['y2']
@@ -26,7 +25,6 @@ def convert_to_output_results(arr):
         output_results[idx, 4] = confidence
         output_results[idx, 5] = cls
         output_results[idx, 6:8] = mm_coordinates
-        output_results[idx, 8:] = [x1, y1, x2, y2]
         # Assign placeholder values for features 3 to 9
         # output_results[idx, 8:] = np.nan  # or any other placeholder value you prefer
     return output_results

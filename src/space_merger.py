@@ -150,8 +150,8 @@ class SpaceMerger:
                         x_shifted = self.align_x(coord[0], idx)
                         det['coordinates'] = (x_shifted, coord[1])
                         # det = self.is_in_overlap(det)
-                        det['box']['x1'] += width
-                        det['box']['x2'] += width
+                        # det['box']['x1'] += width
+                        # det['box']['x2'] += width
                         det['camera'] = idx
                         cam2_space.append(det)
 
@@ -161,8 +161,8 @@ class SpaceMerger:
                         x_shifted = self.align_x(coord[0], idx)
                         det['coordinates'] =  (x_shifted, coord[1])
                         # det = self.is_in_overlap(det)
-                        det['box']['x1'] += 2*width
-                        det['box']['x2'] += 2*width
+                        # det['box']['x1'] += 2*width
+                        # det['box']['x2'] += 2*width
                         det['camera'] = idx
                         cam3_space.append(det)
 
