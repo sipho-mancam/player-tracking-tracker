@@ -11,6 +11,8 @@ import json
 from pprint import pprint
 from pre_transform import PreDetectionsTransform
 from coordinate_transforms import convert_box_2_points
+from pathlib import Path
+import os
 
 class KafkaConsumer:
     def __init__(self, brokers, group_id, topic):
@@ -63,7 +65,7 @@ class KafkaConsumer:
 
 
 class InputData:
-    def __init__(self, broker="172.21.243.238:9092", topic = "kit-detector-topic", group_id = "tracking_core_consumer_1") -> None:
+    def __init__(self, broker="localhost:9092", topic = "kit-detector-topic", group_id = "tracking_core_consumer_1") -> None:
         self.__id = 0
         self.__kafka_consumer = KafkaConsumer(broker, group_id, topic)
         self.__kafka_consumer.start()
@@ -84,8 +86,45 @@ class InputData:
         for cam_data in res_list:
             convert_box_2_points(cam_data)
         return res_list 
-
     
+
+
+class FileInputData:
+    def __init__(self, data_source_dir:Path)->None:
+        self.__current_file = None
+        self.__source_dir = data_source_dir
+        self.__file_names = []
+        self.__current_ptr = 0
+        self.__init_files()
+        self.__advance()
+
+    def __init_files(self)->None:
+        for file in os.scandir(self.__source_dir):
+            self.__file_names.append(file.path)
+
+    def __advance(self)->None:
+        self.__current_file = self.__file_names[self.__current_ptr]
+        self.__current_ptr += 1
+        if self.__current_ptr ==len(self.__file_names):
+            self.__current_ptr = 0
+
+    def stop(self):
+        pass
+        
+    def wait_for_data(self)->dict:
+        with open(self.__current_file, 'r') as fp:
+            data = json.load(fp)
+            self.__advance()
+            return data
+          # pass the received data to a dictionary to be used inside the program
+        # data = json.loads(data)
+        #  Perform the format transform (x_c, y_c, width, height) -> (x1, y1, x2, y2)
+        PreDetectionsTransform.xywh2xyxy(data)
+        res_list = PreDetectionsTransform.cams2list(data)
+        # Perform the coordinate transform (Turn the box to a point for every detection and throw away all the other data we are not using.)
+        for cam_data in res_list:
+            convert_box_2_points(cam_data)
+        return res_list
 
 
 if __name__ == "__main__":

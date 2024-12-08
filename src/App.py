@@ -1,13 +1,16 @@
 from dataloader import DataLoader
-from input import InputData
+from input import InputData, FileInputData
 from transformer import SpaceTransformer
 from space_merger import SpaceMerger
 from pprint import pprint
 from botsort_tracker import track2, track_raw
 from output_ import DetectionsOutput
 import time
+from pathlib import Path
 
 running = True;
+TESTING = False
+
 
 def initialize():
     status = 0
@@ -18,7 +21,25 @@ def main_loop():
     try:
         global running
         #input data from external source
-        input_data = InputData()
+        if not TESTING:
+            input_data = InputData()
+        else:
+             DATA_SOURCE_DIR = Path(r"C:\Users\sipho-mancam\Documents\Programming\Player Tracking\Tracking Core\src\tracking_data_files")
+             input_data = FileInputData(DATA_SOURCE_DIR)
+
+        
+        if TESTING:
+            output = DetectionsOutput()
+            while True:
+                start_time = time.time()
+                data = input_data.wait_for_data() 
+                output.update(data)
+                output.write_to_kafka()
+                time.sleep(0.12)
+
+                end_time = time.time()
+                print(f"Processing Time: {round(1e3*(end_time - start_time))} ms")
+        
 
         # If calibration data doesn't exist, send a message to the UI and wait till it exist.
         config_data = DataLoader().load_config_data()

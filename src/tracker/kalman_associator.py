@@ -90,7 +90,7 @@ class TrackLet:
         self.__vanished = False
         self.__kalman_filter = KalmanFilter(self.dt, self.state_dim, self.meas_dim, self.Q, self.R, self.global_id)
         self.__is_updated = False
-        self.__life_span_reset = 50
+        self.__life_span_reset = 60
         self.__life_span = self.__life_span_reset
         self.__temporary_state = None
         self.__sig_jump_dist = 0.03
@@ -467,7 +467,7 @@ class AssociationsManager:
         self.__guid_counter = 1
         self.__tracklets_pool = [] # Full list of tracklets
         self.__reset_tracks = [] # This contains a list of the tracks that need to be reset.
-        self.__tracklets_limit = 26
+        self.__tracklets_limit = 15
         self.__team_ids_track = [{'ids_track':0, 'tracklets':[], 'color':teams_colors[0], 'init':False, 'id':2, 'guid':0}, 
                                  {'ids_track':0, 'tracklets':[], 'color':teams_colors[1], 'init':False, 'id':1, 'guid':0}]
         self.__teams_init = False
@@ -663,8 +663,8 @@ class AssociationsManager:
                     self.__reset_tracks.pop(i)  
 
 
-        if self.__tracklets_limit % 2 != 0:
-            self.__tracklets_limit += 1
+        # if self.__tracklets_limit % 2 != 0:
+            # self.__tracklets_limit += 1
 
         if len(dets) > 0 and len(self.__tracklets_pool) < self.__tracklets_limit:
             for i, det in enumerate(dets):
@@ -672,7 +672,7 @@ class AssociationsManager:
                 if det.get('track_id') is None:
                     continue
 
-                if len(self.__tracklets_pool) <= self.__tracklets_limit:
+                if len(self.__tracklets_pool) < self.__tracklets_limit:
                     self.__teams_init = True
                     
                     kit_color = det.get('kit_color')
@@ -681,7 +681,7 @@ class AssociationsManager:
                     # if team is None:
                     #     continue
 
-                    id = self.__guid_counter+1#team['guid'] + team['id'] if team['id'] == 0 else (len(team['tracklets']) * 2) + (team['id'])
+                    id = self.__guid_counter#team['guid'] + team['id'] if team['id'] == 0 else (len(team['tracklets']) * 2) + (team['id'])
                         
                     # team['guid'] = id
                     track =  TrackLet(id, det, kit_color)
