@@ -78,16 +78,18 @@ class InputData:
     def wait_for_data(self)->list[list[dict]]:
         
         topic, data = self.__kafka_consumer.wait_for_message()
-
+        
         # pass the received data to a dictionary to be used inside the program
         data = json.loads(data)
         #  Perform the format transform (x_c, y_c, width, height) -> (x1, y1, x2, y2)
-        PreDetectionsTransform.xywh2xyxy(data)
-        res_list = PreDetectionsTransform.cams2list(data)
-        # Perform the coordinate transform (Turn the box to a point for every detection and throw away all the other data we are not using.)
-        for cam_data in res_list:
-            convert_box_2_points(cam_data)
-        return topic, res_list 
+        if topic == "kit-detector-topic":
+            PreDetectionsTransform.xywh2xyxy(data)
+            res_list = PreDetectionsTransform.cams2list(data)
+            # Perform the coordinate transform (Turn the box to a point for every detection and throw away all the other data we are not using.)
+            for cam_data in res_list:
+                convert_box_2_points(cam_data)
+            return topic, res_list
+        return topic, data 
     
 
 

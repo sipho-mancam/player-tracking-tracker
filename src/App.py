@@ -48,7 +48,6 @@ def main_loop():
 
         
         if config[service_name]["testing"]:
-            output = DetectionsOutput(broker, config[service_name]["output_topic"])
             while True:
                 start_time = time.time()
                 data = input_data.wait_for_data() 
@@ -93,6 +92,8 @@ def main_loop():
                 # output.write_to_file()    
                 end_time = time.time()
                 print(f"Processing Time: {round(1e3*(end_time - start_time))} ms")
+            elif in_topic == config[service_name]["kafka"]["events_topic"]:
+                output.process_output_event(data)
             
         input_data.stop()
         return 0
