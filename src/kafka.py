@@ -98,11 +98,10 @@ class KConsumer:
 
 
 class KProducer:
-    def __init__(self, config_file):
-        self.config = ConfigParser()
-        self.config.read(config_file)
+    def __init__(self, broker):
+        self.broker = broker
         conf = {
-            'bootstrap.servers': self.config.get('default', 'bootstrap.servers'),
+            'bootstrap.servers': self.broker,
             'client.id': 'tracking_core_producer'
         }
         self.producer = Producer(conf)

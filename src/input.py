@@ -26,11 +26,11 @@ class KafkaConsumer:
         self.conf = {
             'bootstrap.servers': brokers,
             'group.id': group_id,
-            'auto.offset.reset': 'earliest'
+            'auto.offset.reset': 'latest'
         }
 
         self.consumer = Consumer(self.conf)
-        self.consumer.subscribe([topic])
+        self.consumer.subscribe([topic, "tracking-core-events"])
 
     def start(self):
         self.consumer_thread = threading.Thread(target=self.consume)
@@ -47,7 +47,9 @@ class KafkaConsumer:
                 else:
                     raise KafkaException(msg.error())
             else:
+            
                 with self.cv:
+                    self.topic = msg.topic()
                     self.message = msg.value().decode('utf-8')
                     self.cv.notify_all()
 
@@ -57,7 +59,7 @@ class KafkaConsumer:
             # print(f"Received message: {self.message}")
             temp = self.message
             self.message = None
-            return temp
+            return self.topic, temp
 
     def stop(self):
         self.run = False
@@ -75,7 +77,7 @@ class InputData:
 
     def wait_for_data(self)->list[list[dict]]:
         
-        data = self.__kafka_consumer.wait_for_message()
+        topic, data = self.__kafka_consumer.wait_for_message()
 
         # pass the received data to a dictionary to be used inside the program
         data = json.loads(data)
@@ -85,7 +87,7 @@ class InputData:
         # Perform the coordinate transform (Turn the box to a point for every detection and throw away all the other data we are not using.)
         for cam_data in res_list:
             convert_box_2_points(cam_data)
-        return res_list 
+        return topic, res_list 
     
 
 

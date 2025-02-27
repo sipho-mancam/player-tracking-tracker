@@ -5,9 +5,9 @@ import math
 class SpaceMerger:
     def __init__(self, main_boundary:list, inner_boundary:list)->None:
         self.__stream_results = [] # a list of tuples containing the current results
-        self.__left_wing = 0.3
-        self.__right_wing = 0.3
-        self.__middle = 0.4
+        self.__left_wing = 0.35
+        self.__right_wing = 0.35
+        self.__middle = 0.3
         self.__m_overlap = (1/20)*0.3
         self.__is_init = False
 
