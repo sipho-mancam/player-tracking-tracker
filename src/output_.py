@@ -29,7 +29,7 @@ class DetectionsOutput:
     def process_output_event(self, event:dict)->None:
         if len(event) == 0:
             return 
-        
+        print(event)
         if event["event_name"] == "set_on_air":
             data = event['event_data']
             self._on_air_flag = data["on_air_mode"]
@@ -38,12 +38,22 @@ class DetectionsOutput:
                 self._on_air_plot_ids.clear()
                 self._on_air_state = None
                 self._on_air_plot_ids_map.clear()
-
-        elif event["event_name"] == "enable_id_plot" and self._on_air_flag:
+        
+        if not self._on_air_flag:
+            return
+        
+        if event["event_name"] == "enable_id_plot":
             data = event["event_data"]
             # This is an id that can be plotted
             self._on_air_plot_ids.append(data["id"])
-            self._on_air_plot_ids_map[data["id"]] = [0.0, 0.0]
+            self._on_air_plot_ids_map[data["id"]] = [0.5, 0.5]
+        elif event['event_name'] == "update_idxy":
+            data = event["event_data"]
+            id = data['id']
+            coordinates= data['coordinates']
+            if self._on_air_plot_ids_map.get(id) is not None:
+                self._on_air_plot_ids_map[id] = coordinates
+                print(f"Updated ID: {id} --> Coordinates: {coordinates}")
 
     def update_untracked_ids(self, tracks:dict)->None:
         self._tracked_ids = []
