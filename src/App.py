@@ -68,9 +68,6 @@ def main_loop():
         space_transformer = SpaceTransformer(f_width, f_height, config_data['cams_config'])
 
         # Space Merger
-        # transformer = space_transformer.get_transformer(1)
-        # mini_boundary = transformer.get_mini_boudary()
-        # main_boundary = transformer.getDstPts()
         mini_boundary = []
         main_boundary = []
         space_merger = SpaceMerger(main_boundary, mini_boundary)

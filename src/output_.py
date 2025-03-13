@@ -23,7 +23,7 @@ class DetectionsOutput:
         self._on_air_plot_ids_map = {} # Keeps {id:<float, float>} coordinates
         self._on_air_state = None
         
-        self._id_range = 15
+        self._id_range = 16
         self._tracked_ids = []
 
     def process_output_event(self, event:dict)->None:
@@ -54,6 +54,12 @@ class DetectionsOutput:
             if self._on_air_plot_ids_map.get(id) is not None:
                 self._on_air_plot_ids_map[id] = coordinates
                 print(f"Updated ID: {id} --> Coordinates: {coordinates}")
+        elif event["event_name"] == "id_track_correct":
+            data = event["event_data"]
+            id  = data["id"]
+            self._on_air_plot_ids.append(id)
+            self._on_air_plot_ids_map[data["id"]] = [0.5, 0.5]
+            print(f"Update ID: {id} for Track Correction")
 
     def update_untracked_ids(self, tracks:dict)->None:
         self._tracked_ids = []
