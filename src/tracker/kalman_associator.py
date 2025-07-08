@@ -467,7 +467,7 @@ class AssociationsManager:
         self.__guid_counter = 1
         self.__tracklets_pool = [] # Full list of tracklets
         self.__reset_tracks = [] # This contains a list of the tracks that need to be reset.
-        self.__tracklets_limit = 15
+        self.__tracklets_limit = 31
         self.__team_ids_track = [{'ids_track':0, 'tracklets':[], 'color':teams_colors[0], 'init':False, 'id':2, 'guid':0}, 
                                  {'ids_track':0, 'tracklets':[], 'color':teams_colors[1], 'init':False, 'id':1, 'guid':0}]
         self.__teams_init = False
