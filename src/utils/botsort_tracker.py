@@ -6,7 +6,7 @@ from cfg.config_ import TrackingConf
 import time
 from tracker.kalman_associator import AssociationsManager
 from pprint import pprint
-from state_representation import State
+from utils.state_representation import State
 
 tracker = BoTSORT(TrackingConf(), 10)
 frame_count = 0

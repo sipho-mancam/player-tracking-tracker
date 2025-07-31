@@ -1,4 +1,4 @@
-from kafka import KProducer
+from utils.kafka import KProducer
 import json
 import time
 from pathlib import Path

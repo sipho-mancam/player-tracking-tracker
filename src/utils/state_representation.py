@@ -1,7 +1,7 @@
 import numpy as np
 from tracker.proximity_calculator import ProximityCalculator
 import math
-from dataloader import StateLoader, Point
+from utils.dataloader import StateLoader, Point
 
 
 class State:

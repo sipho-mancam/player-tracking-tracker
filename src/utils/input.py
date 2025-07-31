@@ -9,8 +9,8 @@ import confluent_kafka
 from confluent_kafka import Consumer, KafkaException
 import json
 from pprint import pprint
-from pre_transform import PreDetectionsTransform
-from coordinate_transforms import convert_box_2_points
+from utils.pre_transform import PreDetectionsTransform
+from utils.coordinate_transforms import convert_box_2_points
 from pathlib import Path
 import os
 

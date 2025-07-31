@@ -1,10 +1,10 @@
-from dataloader import DataLoader
-from input import InputData, FileInputData
-from transformer import SpaceTransformer
-from space_merger import SpaceMerger
+from utils.dataloader import DataLoader
+from utils.input import InputData, FileInputData
+from utils.transformer import SpaceTransformer
+from utils.space_merger import SpaceMerger
 from pprint import pprint
-from botsort_tracker import track2, track_raw
-from output_ import DetectionsOutput
+from utils.botsort_tracker import track2, track_raw
+from utils.output_ import DetectionsOutput
 import time
 from pathlib import Path
 import json
@@ -26,7 +26,6 @@ def __load_config__(dataPath: Path = Path(r"C:\ProgramData\Player Tracking Softw
 def main_loop():
     try:
         global running
-
         config = __load_config__()
         if len(config) == 0:
             raise FileNotFoundError("Config file not found.")
